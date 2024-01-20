@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TranslationSourceGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Xorog\\Documents\\GitHub\\ProjectIchigo\\ProjectMakoto\\Translations\\strings.json\" \"C:\\Users\\Xorog\\Documents\\GitHub\\ProjectIchigo\\ProjectMakoto\\Entities\\Translation\\Translations.cs\""
+    }
+  }
+}
