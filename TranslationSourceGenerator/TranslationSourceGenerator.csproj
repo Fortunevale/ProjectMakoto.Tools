@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\Xorog.Logger\Xorog.Logger.csproj" />
-    <ProjectReference Include="..\..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.Logger\Xorog.Logger.csproj" />
+    <ProjectReference Include="..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>
 
 </Project>

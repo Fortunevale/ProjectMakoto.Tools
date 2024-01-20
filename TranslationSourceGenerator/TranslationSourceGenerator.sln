@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranslationSourceGenerator", "TranslationSourceGenerator.csproj", "{1962E64F-BFA8-4ECA-83C6-FD09959D7E98}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "..\..\Dependencies\Xorog.Logger\Xorog.Logger.csproj", "{8A8883E2-C01C-48A5-9CFF-16DB013DA0C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "..\Dependencies\Xorog.Logger\Xorog.Logger.csproj", "{8A8883E2-C01C-48A5-9CFF-16DB013DA0C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{1082AEE5-F298-412D-BE0D-12253D25AF1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\Dependencies\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{1082AEE5-F298-412D-BE0D-12253D25AF1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
