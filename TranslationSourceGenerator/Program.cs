@@ -7,12 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-global using Xorog.Logger;
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
-global using static TranslationSourceGenerator.Log;
-global using static Xorog.UniversalExtensions.UniversalExtensions;
 global using Newtonsoft.Json;
+global using Serilog;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
@@ -62,25 +60,27 @@ public class Translations : ITranslations
         if (!Directory.Exists($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs"))
             _ = Directory.CreateDirectory($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs");
 
-        _logger = LoggerClient.StartLogger($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Debug, DateTime.UtcNow.AddDays(-3), false);
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
 
         _ = Task.Run(async () =>
         {
             if (!File.Exists(args.Length > 0 ? args[0] : "e252zru2rjb2rtb23jbrj2bthj2bthjb2jtb4jbtb2jtb4hj"))
             {
-                _logger.LogError("Translation json expected as arg0");
+                Log.Error("Translation json expected as arg0");
                 return;
             }
             
             if (!File.Exists(args.Length > 1 ? args[1] : "e252zru2rjb2rtb23jbrj2bthj2bthjb2jtb4jbtb2jtb4hj"))
             {
-                _logger.LogError("Translation json expected as arg1");
+                Log.Error("Translation json expected as arg1");
                 return;
             }
 
             if (args.Length < 2)
             {
-                _logger.LogError("Namespace expected as arg2");
+                Log.Error("Namespace expected as arg2");
                 return;
             }
 
@@ -88,9 +88,9 @@ public class Translations : ITranslations
             this.TranslationCs = args[1];
             this.Namespace = args[2];
 
-            _logger.LogDebug("Project Makoto Translation Source Generator started up.");
-            _logger.LogDebug("Strings.json Location: {0}", Path.GetFullPath(this.StringsJson));
-            _logger.LogDebug("Translation.cs Location: {0}", Path.GetFullPath(this.TranslationCs));
+            Log.Debug("Project Makoto Translation Source Generator started up.");
+            Log.Debug("Strings.json Location: {0}", Path.GetFullPath(this.StringsJson));
+            Log.Debug("Translation.cs Location: {0}", Path.GetFullPath(this.TranslationCs));
             DateTime lastModify = new();
             while (true)
             {
@@ -107,7 +107,7 @@ public class Translations : ITranslations
                             List<string> Warnings = new();
                             var Insert = "";
 
-                            _logger.LogDebug("Translation file updated. Updating Translations.cs..");
+                            Log.Debug("Translation file updated. Updating Translations.cs..");
 
                             var jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(this.StringsJson));
 
@@ -170,7 +170,7 @@ public class Translations : ITranslations
                                                     if (addedFields[IndexPath].Contains(line))
                                                         continue;
 
-                                                    _logger.LogDebug("Found SingleKey '{0}'", item.Key);
+                                                    Log.Debug("Found SingleKey '{0}'", item.Key);
                                                     Insert = Insert.Insert(InsertPosition, $"\n{line}");
 
                                                     addedFields[IndexPath].Add(line);
@@ -185,7 +185,7 @@ public class Translations : ITranslations
                                                     if (addedFields[IndexPath].Contains(line))
                                                         continue;
 
-                                                    _logger.LogDebug("Found MultiKey '{0}'", item.Key);
+                                                    Log.Debug("Found MultiKey '{0}'", item.Key);
                                                     Insert = Insert.Insert(InsertPosition, $"\n{line}");
 
                                                     addedFields[IndexPath].Add(line);
@@ -197,7 +197,7 @@ public class Translations : ITranslations
                                             }
                                             else
                                             {
-                                                _logger.LogDebug("Found Group '{0}'", item.Key);
+                                                Log.Debug("Found Group '{0}'", item.Key);
 
                                                 var line = $"\n{new string(' ', depth * 4)}public {className} {fieldName};\n" +
                                                     $"{new string(' ', depth * 4)}public sealed class {className}\n" +
@@ -217,7 +217,7 @@ public class Translations : ITranslations
                                         }
                                         case JTokenType.Integer:
                                         {
-                                            _logger.LogDebug("Found Int '{0}'", item.Key);
+                                            Log.Debug("Found Int '{0}'", item.Key);
 
                                             var line = $"\n{new string(' ', depth * 4)}public int {CreateValidValueName(item.Key)};";
 
@@ -230,7 +230,7 @@ public class Translations : ITranslations
                                         }
                                         case JTokenType.Array:
                                         {
-                                            _logger.LogDebug("Found Array '{0}'", item.Key);
+                                            Log.Debug("Found Array '{0}'", item.Key);
 
                                             var line = $"\n{new string(' ', depth * 4)}public {className}[] {fieldName};\n" +
                                                 $"{new string(' ', depth * 4)}public sealed class {className}\n" +
@@ -261,20 +261,20 @@ public class Translations : ITranslations
                             RecursiveHandle(jsonFile, "", 1);
                             foreach (var b in Warnings)
                             {
-                                _logger.LogWarn(b);
+                                Log.Warning(b);
                             }
 
-                            _logger.LogWarn("Source Generation finished with {Count} warnings.", Warnings.Count);
+                            Log.Warning("Source Generation finished with {Count} warnings.", Warnings.Count);
 
                             Insert = string.Join("\n", Insert.Split("\n").Where(x => !x.Contains("InsertPoint")));
 
                             File.WriteAllText(this.TranslationCs, string.Join("\n", this.MakotoSourceOrigin.Replace("// InsertPoint", Insert).ReplaceLineEndings("\n").Split("\n", StringSplitOptions.RemoveEmptyEntries).Where(x => !x.IsNullOrWhiteSpace())));
 
-                            _logger.LogDebug("Updated Translations.cs.");
+                            Log.Debug("Updated Translations.cs.");
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Failed to update Translations.cs.", ex);
+                            Log.Error(ex, "Failed to update Translations.cs.");
                         }
                     }
 
@@ -284,7 +284,7 @@ public class Translations : ITranslations
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Failed to watch file", ex);
+                    Log.Error(ex, "Failed to watch file");
                     await Task.Delay(10000);
                 }
             }
